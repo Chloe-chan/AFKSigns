@@ -1,0 +1,7 @@
+# afk-time is how long till a player gets marked as AFK (in minutes)
+# save-message is to select whether to save player's messages on exit
+# use-notification is to allow plugin to query if new updates are available
+
+afk-time: 5
+save-message: true
+use-notification: true
