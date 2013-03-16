@@ -360,6 +360,12 @@ public class AFKManager
 		return playerMessageMap.get(playerName);
 	}
 
+	public static boolean containsPlayerMessage(Player player)
+	{
+		String playerName = player.getName();
+		return playerMessageMap.containsKey(playerName);
+	}
+
 
 	public static long getPlayerTime(Player player)
 	{
