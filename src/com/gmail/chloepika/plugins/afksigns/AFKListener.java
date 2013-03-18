@@ -77,7 +77,10 @@ public class AFKListener implements Listener
 	@EventHandler
 	public void onPlayerCommand(PlayerCommandPreprocessEvent event)
 	{
-		AFKManager.cancelAFK(event.getPlayer(), true);
+		if (!event.getMessage().equalsIgnoreCase("/afk"))
+		{
+			AFKManager.cancelAFK(event.getPlayer(), true);
+		}
 	}
 
 	@EventHandler

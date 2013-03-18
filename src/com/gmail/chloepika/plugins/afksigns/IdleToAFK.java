@@ -13,6 +13,6 @@ public class IdleToAFK implements Runnable
 
 	public void run()
 	{
-		AFKManager.goAFK(player);
+		AFKManager.goAFK(player, false);
 	}
 }

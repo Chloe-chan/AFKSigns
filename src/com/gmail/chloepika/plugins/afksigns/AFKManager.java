@@ -24,7 +24,8 @@ public class AFKManager
 	private static HashMap<String, Long> playerStartMap = new HashMap<String, Long>();
 	private static HashMap<String, Location> playerAFKLocationMap = new HashMap<String, Location>();
 
-	private static HashMap<Location, Block> originalBlockMap = new HashMap<Location, Block>();
+	private static HashMap<Location, Integer> originalBlockIDMap = new HashMap<Location, Integer>();
+	private static HashMap<Location, Byte> originalBlockDataMap = new HashMap<Location, Byte>();
 
 	private static HashMap<String, String> playerMessageMap = new HashMap<String, String>();
 	private static List<String> playerGodList = new ArrayList<String>();
@@ -234,7 +235,7 @@ public class AFKManager
 
 
 
-	public static void goAFK(Player player)
+	public static void goAFK(Player player, boolean stopTrack)
 	{
 		if (!isPlayerAFK(player))
 		{
@@ -251,9 +252,13 @@ public class AFKManager
 
 			playerStartMap.put(playerName, playerTime);
 			playerAFKLocationMap.put(playerName, location);
-			originalBlockMap.put(location, locationBlock);
+			originalBlockIDMap.put(location, locationBlock.getTypeId());
+			originalBlockDataMap.put(location, locationBlock.getData());
 
-			IdleManager.stopTrack(player);
+			if (stopTrack)
+			{
+				IdleManager.stopTrack(player);
+			}
 
 			locationBlock.setType(Material.SIGN_POST);
 			Sign sign = (Sign) locationBlock.getState();
@@ -277,13 +282,16 @@ public class AFKManager
 		{
 			String playerName = player.getName();
 			Location playerLocation = playerAFKLocationMap.get(playerName);
-			Block playerLocationBlock = originalBlockMap.get(playerLocation);
-			playerLocation.getBlock().setTypeIdAndData(playerLocationBlock.getTypeId(), playerLocationBlock.getData(), true);
+			int playerLocationBlockID = originalBlockIDMap.get(playerLocation);
+			byte playerLocationBlockData = originalBlockDataMap.get(playerLocation);
+			playerLocation.getBlock().setTypeId(playerLocationBlockID);
+			playerLocation.getBlock().setData(playerLocationBlockData);
 			cancelScheduler(player);
 			playerTaskMap.remove(playerName);
 			playerStartMap.remove(playerName);
 			playerAFKLocationMap.remove(playerName);
-			originalBlockMap.remove(playerLocation);
+			originalBlockIDMap.remove(playerLocation);
+			originalBlockDataMap.remove(playerLocation);
 			if (track)
 			{
 				IdleManager.startTrack(player);
@@ -357,7 +365,14 @@ public class AFKManager
 	public static String getPlayerMessage(Player player)
 	{
 		String playerName = player.getName();
-		return playerMessageMap.get(playerName);
+		String message = playerMessageMap.get(playerName);
+		if (message != null)
+		{
+			return message;
+		} else
+		{
+			return (ChatColor.AQUA + "-no message-");
+		}
 	}
 
 	public static boolean containsPlayerMessage(Player player)

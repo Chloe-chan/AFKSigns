@@ -37,7 +37,6 @@ public class IdleManager
 
 	public static void stopTrack(Player player)
 	{
-
 		if (isTracking(player))
 		{
 			String playerName = player.getName();
