@@ -26,7 +26,13 @@ public class UpdateSign implements Runnable
 
 	private void fetchMessage()
 	{
-		playerMessage = AFKManager.getPlayerMessage(player);
+		if (AFKManager.containsPlayerMessage(player))
+		{
+			playerMessage = AFKManager.getPlayerMessage(player);
+		} else
+		{
+			playerMessage = "";
+		}
 	}
 
 	private void fetchTimeMessage()

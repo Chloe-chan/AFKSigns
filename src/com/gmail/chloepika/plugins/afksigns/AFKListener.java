@@ -1,9 +1,5 @@
 package com.gmail.chloepika.plugins.afksigns;
 
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.block.Block;
-import org.bukkit.block.Sign;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -41,25 +37,10 @@ public class AFKListener implements Listener
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler
 	public void onBlockBreak(BlockBreakEvent event)
 	{
-		{
-			AFKManager.cancelAFK(event.getPlayer(), true);
-		}
-		{
-			Block block = event.getBlock();
-			if (block.getState() instanceof Sign)
-			{
-				Location location = block.getLocation();
-				boolean cancel = AFKManager.isLocationUsed(location);
-				if (cancel)
-				{
-					event.setCancelled(cancel);
-					event.getPlayer().sendMessage(ChatColor.RED + "This sign is protected.");
-				}
-			}
-		}
+		AFKManager.cancelAFK(event.getPlayer(), true);
 	}
 
 	@EventHandler

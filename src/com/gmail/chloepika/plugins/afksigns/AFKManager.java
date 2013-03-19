@@ -16,6 +16,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
+import org.bukkit.metadata.FixedMetadataValue;
 
 public class AFKManager
 {
@@ -263,6 +264,8 @@ public class AFKManager
 			locationBlock.setType(Material.SIGN_POST);
 			Sign sign = (Sign) locationBlock.getState();
 
+			locationBlock.setMetadata("afkProtected", new FixedMetadataValue(plugin, true));
+
 			callSignScheduler(player, sign);
 
 			player.sendMessage(ChatColor.RED + "You are now AFK.");
@@ -284,14 +287,20 @@ public class AFKManager
 			Location playerLocation = playerAFKLocationMap.get(playerName);
 			int playerLocationBlockID = originalBlockIDMap.get(playerLocation);
 			byte playerLocationBlockData = originalBlockDataMap.get(playerLocation);
+
+			playerLocation.getBlock().removeMetadata("afkProtected", plugin);
+
 			playerLocation.getBlock().setTypeId(playerLocationBlockID);
 			playerLocation.getBlock().setData(playerLocationBlockData);
+
 			cancelScheduler(player);
+
 			playerTaskMap.remove(playerName);
 			playerStartMap.remove(playerName);
 			playerAFKLocationMap.remove(playerName);
 			originalBlockIDMap.remove(playerLocation);
 			originalBlockDataMap.remove(playerLocation);
+
 			if (track)
 			{
 				IdleManager.startTrack(player);
@@ -366,13 +375,7 @@ public class AFKManager
 	{
 		String playerName = player.getName();
 		String message = playerMessageMap.get(playerName);
-		if (message != null)
-		{
-			return message;
-		} else
-		{
-			return (ChatColor.AQUA + "-no message-");
-		}
+		return message;
 	}
 
 	public static boolean containsPlayerMessage(Player player)
@@ -436,12 +439,5 @@ public class AFKManager
 	{
 		String playerName = player.getName();
 		playerGodList.remove(playerName);
-	}
-
-
-
-	public static boolean isLocationUsed(Location location)
-	{
-		return playerAFKLocationMap.containsValue(location);
 	}
 }

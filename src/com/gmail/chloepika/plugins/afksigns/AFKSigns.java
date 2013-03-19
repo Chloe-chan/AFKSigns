@@ -20,6 +20,7 @@ public class AFKSigns extends JavaPlugin
 	{
 		getServer().getPluginManager().registerEvents(new AFKListener(), this);
 		getServer().getPluginManager().registerEvents(new JoinQuitListener(), this);
+		getServer().getPluginManager().registerEvents(new AFKSignProtect(), this);
 		AFKManager.readNewPlayerMessage();
 		AFKManager.readPlayerGod();
 		saveDefaultConfig();
@@ -245,6 +246,10 @@ public class AFKSigns extends JavaPlugin
 								}
 								return true;
 							}
+						} else
+						{
+							player.sendMessage(Messages.noperm.getMessage());
+							return true;
 						}
 					} else
 					{

@@ -1,6 +1,6 @@
 main: com.gmail.chloepika.plugins.afksigns.AFKSigns
 name: AFK Signs
-version: 1.2
+version: 1.2.1
 author: Chloe-chan
 description: A plugin that handles AFK players.
 
