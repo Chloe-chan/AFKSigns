@@ -20,6 +20,7 @@ public class AFKSigns extends JavaPlugin
 	{
 		getServer().getPluginManager().registerEvents(new AFKListener(), this);
 		getServer().getPluginManager().registerEvents(new JoinQuitListener(), this);
+		getServer().getPluginManager().registerEvents(new AFKGodListener(), this);
 		getServer().getPluginManager().registerEvents(new AFKSignProtect(), this);
 		AFKManager.readNewPlayerMessage();
 		AFKManager.readPlayerGod();
@@ -134,6 +135,10 @@ public class AFKSigns extends JavaPlugin
 										}
 										return true;
 									}
+									{
+										sender.sendMessage(error(Messages.invalidtarget.getMessage(), "/afk messages others <player> [get/set/delete] <args>"));
+										return true;
+									}
 								} else
 								{
 									sender.sendMessage(ChatColor.AQUA + args[2] + ChatColor.RED + " is not online.");
@@ -149,7 +154,7 @@ public class AFKSigns extends JavaPlugin
 							Player target = Bukkit.getPlayer(args[2]);
 							if (target != null)
 							{
-								if (args[3].equalsIgnoreCase("get") || args[3].equalsIgnoreCase("g"))
+								if (args[3].equalsIgnoreCase("get") || args[3].equalsIgnoreCase("g") || args[3].equalsIgnoreCase("current") || args[3].equalsIgnoreCase("curr") || args[3].equalsIgnoreCase("cur") || args[3].equalsIgnoreCase("c"))
 								{
 									if (AFKManager.containsPlayerMessage(target))
 									{
@@ -193,6 +198,10 @@ public class AFKSigns extends JavaPlugin
 									}
 									return true;
 								}
+								{
+									sender.sendMessage(error(Messages.invalidtarget.getMessage(), "/afk messages others <player> [get/set/delete] <args>"));
+									return true;
+								}
 							}
 						}
 					}
@@ -204,7 +213,7 @@ public class AFKSigns extends JavaPlugin
 						Player player = (Player) sender;
 						if (AFKPerm.messagePersonal(player))
 						{
-							if (args[1].equalsIgnoreCase("get") || args[1].equalsIgnoreCase("g"))
+							if (args[1].equalsIgnoreCase("get") || args[1].equalsIgnoreCase("g") || args[1].equalsIgnoreCase("current") || args[1].equalsIgnoreCase("curr") || args[3].equalsIgnoreCase("cur") || args[3].equalsIgnoreCase("c"))
 							{
 								if (AFKManager.containsPlayerMessage(player))
 								{
@@ -244,6 +253,189 @@ public class AFKSigns extends JavaPlugin
 								{
 									player.sendMessage(error(Messages.notarget.getMessage(), "/afk messages set <message>"));
 								}
+								return true;
+							}
+							{
+								player.sendMessage(error(Messages.invalidtarget.getMessage(), "/afk messages [get/set/delete] <args>"));
+								return true;
+							}
+						} else
+						{
+							player.sendMessage(Messages.noperm.getMessage());
+							return true;
+						}
+					} else
+					{
+						sender.sendMessage(Messages.playeronly.getMessage());
+						return true;
+					}
+				}
+			}
+			if (args[0].equalsIgnoreCase("god") || args[0].equalsIgnoreCase("g"))
+			{
+				//afk god on/off
+				//afk god o p o/f
+				if (args.length < 2)
+				{
+					sender.sendMessage(error(Messages.notarget.getMessage(), "/afk god [on/off]"));
+					return true;
+				}
+				if (args[1].equalsIgnoreCase("others") || args[1].equalsIgnoreCase("other") || args[1].equalsIgnoreCase("o"))
+				{
+					if (args.length < 4)
+					{
+						sender.sendMessage(error(Messages.notarget.getMessage(), "/afk god others <player> [get/on/off]"));
+						return true;
+					} else
+					{
+						Player target = Bukkit.getServer().getPlayer(args[2]);
+						if (target != null)
+						{
+							if (sender instanceof Player)
+							{
+								Player player = (Player) sender;
+								if (AFKPerm.godOthers(player))
+								{
+									if (args[3].equalsIgnoreCase("get") || args[3].equalsIgnoreCase("g") || args[3].equalsIgnoreCase("current") || args[3].equalsIgnoreCase("curr") || args[3].equalsIgnoreCase("cur") || args[3].equalsIgnoreCase("c"))
+									{
+										if (AFKManager.isPlayerGod(target))
+										{
+											sender.sendMessage(ChatColor.AQUA + target.getName() + ChatColor.RED + "'s god-mode is " + ChatColor.AQUA + "ON" + ChatColor.RED + ".");
+										} else
+										{
+											sender.sendMessage(ChatColor.AQUA + target.getName() + ChatColor.RED + "'s god-mode is " + ChatColor.AQUA + "OFF" + ChatColor.RED + ".");
+										}
+										return true;
+									}
+									if (args[3].equalsIgnoreCase("on") || args[3].equalsIgnoreCase("true"))
+									{
+										if (!AFKManager.isPlayerGod(target))
+										{
+											AFKManager.addGod(target);
+											sender.sendMessage(ChatColor.AQUA + target.getName() + ChatColor.RED + "'s god-mode is now " + ChatColor.AQUA + "ON" + ChatColor.RED + ".");
+											target.sendMessage(ChatColor.RED + "Your god-mode is now " + ChatColor.AQUA + "ON" + ChatColor.RED + ".");
+										} else
+										{
+											sender.sendMessage(ChatColor.AQUA + target.getName() + ChatColor.RED + "'s god-mode is already " + ChatColor.AQUA + "ON" + ChatColor.RED + ".");
+										}
+										return true;
+									}
+									if (args[3].equalsIgnoreCase("off") || args[3].equalsIgnoreCase("false"))
+									{
+										if (AFKManager.isPlayerGod(target))
+										{
+											AFKManager.removeGod(target);
+											sender.sendMessage(ChatColor.AQUA + target.getName() + ChatColor.RED + "'s god-mode is now " + ChatColor.AQUA + "OFF" + ChatColor.RED + ".");
+											target.sendMessage(ChatColor.RED + "Your god-mode is now " + ChatColor.AQUA + "OFF" + ChatColor.RED + ".");
+										} else
+										{
+											sender.sendMessage(ChatColor.AQUA + target.getName() + ChatColor.RED + "'s god-mode is already " + ChatColor.AQUA + "OFF" + ChatColor.RED + ".");
+										}
+										return true;
+									}
+									{
+										sender.sendMessage(error(Messages.invalidtarget.getMessage(), "/afk god others <player> [get/on/off]"));
+										return true;
+									}
+								} else
+								{
+									player.sendMessage(Messages.noperm.getMessage());
+									return true;
+								}
+							} else
+							{
+								if (args[3].equalsIgnoreCase("get") || args[3].equalsIgnoreCase("g") || args[3].equalsIgnoreCase("current") || args[3].equalsIgnoreCase("curr") || args[3].equalsIgnoreCase("cur") || args[3].equalsIgnoreCase("c"))
+								{
+									if (AFKManager.isPlayerGod(target))
+									{
+										sender.sendMessage(ChatColor.AQUA + target.getName() + ChatColor.RED + "'s god-mode is " + ChatColor.AQUA + "ON" + ChatColor.RED + ".");
+									} else
+									{
+										sender.sendMessage(ChatColor.AQUA + target.getName() + ChatColor.RED + "'s god-mode is " + ChatColor.AQUA + "OFF" + ChatColor.RED + ".");
+									}
+									return true;
+								}
+								if (args[3].equalsIgnoreCase("on") || args[3].equalsIgnoreCase("true"))
+								{
+									if (!AFKManager.isPlayerGod(target))
+									{
+										AFKManager.addGod(target);
+										sender.sendMessage(ChatColor.AQUA + target.getName() + ChatColor.RED + "'s god-mode is now " + ChatColor.AQUA + "ON" + ChatColor.RED + ".");
+										target.sendMessage(ChatColor.RED + "Your god-mode is now " + ChatColor.AQUA + "ON" + ChatColor.RED + ".");
+									} else
+									{
+										sender.sendMessage(ChatColor.AQUA + target.getName() + ChatColor.RED + "'s god-mode is already " + ChatColor.AQUA + "ON" + ChatColor.RED + ".");
+									}
+									return true;
+								}
+								if (args[3].equalsIgnoreCase("off") || args[3].equalsIgnoreCase("false"))
+								{
+									if (AFKManager.isPlayerGod(target))
+									{
+										AFKManager.removeGod(target);
+										sender.sendMessage(ChatColor.AQUA + target.getName() + ChatColor.RED + "'s god-mode is now " + ChatColor.AQUA + "OFF" + ChatColor.RED + ".");
+										target.sendMessage(ChatColor.RED + "Your god-mode is now " + ChatColor.AQUA + "OFF" + ChatColor.RED + ".");
+									} else
+									{
+										sender.sendMessage(ChatColor.AQUA + target.getName() + ChatColor.RED + "'s god-mode is already " + ChatColor.AQUA + "OFF" + ChatColor.RED + ".");
+									}
+									return true;
+								}
+								{
+									sender.sendMessage(error(Messages.invalidtarget.getMessage(), "/afk god others <player> [get/on/off]"));
+									return true;
+								}
+							}
+						} else
+						{
+							sender.sendMessage(ChatColor.AQUA + args[2] + ChatColor.RED + " is not online.");
+							return true;
+						}
+					}
+				} else
+				{
+					if (sender instanceof Player)
+					{
+						Player player = (Player) sender;
+						if (AFKPerm.godPersonal(player))
+						{
+							if (args[1].equalsIgnoreCase("get") || args[1].equalsIgnoreCase("g") || args[1].equalsIgnoreCase("current") || args[1].equalsIgnoreCase("curr") || args[1].equalsIgnoreCase("cur") || args[1].equalsIgnoreCase("c"))
+							{
+								if (AFKManager.isPlayerGod(player))
+								{
+									player.sendMessage(ChatColor.RED + "Your god-mode is " + ChatColor.AQUA + "ON" + ChatColor.RED + ".");
+								} else
+								{
+									player.sendMessage(ChatColor.RED + "Your god-mode is " + ChatColor.AQUA + "OFF" + ChatColor.RED + ".");
+								}
+								return true;
+							}
+							if (args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("true"))
+							{
+								if (!AFKManager.isPlayerGod(player))
+								{
+									AFKManager.addGod(player);
+									player.sendMessage(ChatColor.RED + "Your god-mode is now " + ChatColor.AQUA + "ON" + ChatColor.RED + ".");
+								} else
+								{
+									player.sendMessage(ChatColor.RED + "Your god-mode is already " + ChatColor.AQUA + "ON" + ChatColor.RED + ".");
+								}
+								return true;
+							}
+							if (args[1].equalsIgnoreCase("off") || args[1].equalsIgnoreCase("false"))
+							{
+								if (AFKManager.isPlayerGod(player))
+								{
+									AFKManager.removeGod(player);
+									player.sendMessage(ChatColor.RED + "Your god-mode is now " + ChatColor.AQUA + "OFF" + ChatColor.RED + ".");
+								} else
+								{
+									player.sendMessage(ChatColor.RED + "Your god-mode is already " + ChatColor.AQUA + "OFF" + ChatColor.RED + ".");
+								}
+								return true;
+							}
+							{
+								player.sendMessage(error(Messages.invalidtarget.getMessage(), "/afk god [get/on/off]"));
 								return true;
 							}
 						} else
@@ -323,14 +515,26 @@ public class AFKSigns extends JavaPlugin
 				help.add(helpMaker("afk message others <player> delete", "Deletes the player's AFK message."));
 				help.add(helpMaker("afk message others <player> set <message>", "Sets the player's AFK message."));
 			}
+			if (AFKPerm.godPersonal(player))
+			{
+				help.add(helpMaker("afk god get", "Shows if god-mode is on during AFK."));
+				help.add(helpMaker("afk god on", "Turns god-mode on during AFK."));
+				help.add(helpMaker("afk god off", "Turns god-mode off during AFK."));
+			}
+			if (AFKPerm.godOthers(player))
+			{
+				help.add(helpMaker("afk god others <player> get", "Shows if god-mode is on for the player during AFK."));
+				help.add(helpMaker("afk god others <player> on", "Turns god-mode on for the player during AFK."));
+				help.add(helpMaker("afk god others <player> off", "Turns god-mode off for the player during AFK."));
+			}
 		} else
 		{
-			help.add(helpMaker("afk message get", "Shows your AFK message."));
-			help.add(helpMaker("afk message delete", "Deletes your AFK message."));
-			help.add(helpMaker("afk message set <message>", "Sets your AFK message."));
 			help.add(helpMaker("afk message others <player> get", "Shows the player's AFK message."));
 			help.add(helpMaker("afk message others <player> delete", "Deletes the player's AFK message."));
 			help.add(helpMaker("afk message others <player> set <message>", "Sets the player's AFK message."));
+			help.add(helpMaker("afk god others <player> get", "Shows if god-mode is on for the player during AFK."));
+			help.add(helpMaker("afk god others <player> on", "Turns god-mode on for the player during AFK."));
+			help.add(helpMaker("afk god others <player> off", "Turns god-mode off for the player during AFK."));
 		}
 		String dash = "";
 		for (int ran = 8; ran < header.length(); ran ++)
